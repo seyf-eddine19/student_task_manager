@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+    <!-- ✅ عرض رسائل التنبيه -->
+    {% if messages %}
+        <div class="alert-container">
+            {% for message in messages %}
+                <div class="alert {{ message.tags|default:'alert-info' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- ✅ كرت تعديل الملف الشخصي -->
+    <div class="card shadow-sm">
+        <div class="card-header text-white text-end bg-dark">
+            <h1 class="text-white">تعديل الملف الشخصي</h1>
+        </div>
+        <div class="card-body">
+            <form method="post" class="custom-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-success px-4 py-2"><i class="bi bi-save"></i>  تحديث الملف الشخصي</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ✅ كرت تغيير كلمة المرور -->
+    <div class="card shadow-sm mt-3">
+        <div class="card-header text-white text-end bg-dark">
+            <h1 class="text-white">تغيير كلمة المرور</h1>
+        </div>
+        <div class="card-body">
+            <form method="post" class="custom-form">
+                {% csrf_token %}
+                {{ password_form.as_p }}
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-warning px-4 py-2"><i class="bi bi-key"></i>  تغيير كلمة المرور</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

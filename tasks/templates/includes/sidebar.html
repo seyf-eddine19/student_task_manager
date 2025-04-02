@@ -1,0 +1,37 @@
+<aside class="sidebar bg-dark text-white p-2 vh-100" tabindex="-1" id="sidebar">
+    <ul class="nav row  px-0 py-1 mt-5">
+        <li class="nav-item my-1">
+            <a href="{% url 'index' %}" class="nav-link text-white {% if request.path == '/' %}active{% endif %}">
+                <i class="bi bi-house-door-fill"></i> <span class="sidebar-text mx-2">الرئيسية</span>
+            </a>
+        </li>
+        {% if request.user.is_admin %}
+        <li class="nav-item my-1">
+            <a href="{% url 'event_list' %}" class="nav-link text-white {% if '/events/' in request.path %}active{% endif %}">
+                <i class="bi bi-folder-fill"></i> <span class="sidebar-text mx-2">الاحداث</span>
+            </a>
+        </li>
+        {% endif %}
+        {% if not request.user.is_admin %}
+        <li class="nav-item my-1">
+            <a href="{% url 'task_list' %}" class="nav-link text-white {% if '/tasks/' in request.path %}active{% endif %}">
+                <i class="bi bi-check2-square"></i> <span class="sidebar-text mx-2">المهام</span>
+            </a>
+        </li>
+        {% endif %}
+        {% if request.user.is_admin %}
+        <li class="nav-item my-1">
+            <a href="{% url 'user_list' %}" class="nav-link text-white {% if '/users/' in request.path %}active{% endif %}">
+                <i class="bi bi-people-fill"></i> <span class="sidebar-text mx-2">المستخدمين</span>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+    <!-- Logout Button -->
+    <div class="mt-auto mb-0">
+        <a href="{% url 'logout' %}" class="btn btn-danger w-100">
+            <i class="bi bi-box-arrow-right me-2"></i> <span class="sidebar-text">تسجيل الخروج</span>
+        </a>
+    </div>
+</aside>
+

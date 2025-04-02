@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+
+{% block title %} لوحة التحكم | المستخدمين {% endblock %}
+
+{% block content %}
+<div class="container my-3">
+
+    <!-- 🎨 عنوان الصفحة -->
+    <div class="row">
+        <div class="col-12">
+            <div class="bg-dark text-white text-center p-4 rounded shadow-sm">
+                <h2 class="fw-bold"><i class="bi bi-people-fill"></i> إدارة المستخدمين</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🛠️ شريط الإجراءات -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center my-3">
+        <h5 class="text-muted"><i class="bi bi-person-lines-fill"></i> قائمة المستخدمين</h5>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <a href="{% url 'user_create' %}" class="btn btn-dark rounded-pill shadow-sm">
+            <i class="bi bi-person-plus"></i> إضافة مسؤول
+        </a>
+        <a href="{% url 'student_create' %}" class="btn btn-dark rounded-pill shadow-sm">
+            <i class="bi bi-person-plus"></i> إضافة طالب
+        </a>
+    </div>
+    </div>
+
+    <!-- ⚠️ رسائل التنبيهات -->
+    {% if messages %}
+        <div class="alert-container my-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% endif %} shadow-sm">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <div class="table-responsive bg-white my-3">
+        <table id="usersTable" class="table table-responsive table-striped table-hover border">
+          <thead class="table-dark">
+            <tr>
+              <th>اسم المستخدم</th>
+              <th>الاسم الكامل</th>
+              <th>الصلاحيات</th>
+              <th>نشط</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+              <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.full_name }}</td>
+                <td>
+                    {% if user.is_admin %}
+                        <span class="badge bg-warning text-dark"><i class="bi bi-shield-lock"></i> مسؤول</span>
+                    {% elif user.is_student %}
+                        <span class="badge bg-secondary"><i class="bi bi-person"></i> طالب</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.is_active %}
+                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> نشط</span>
+                    {% else %}
+                        <span class="badge bg-danger"><i class="bi bi-x-circle"></i> غير نشط</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- <a href="{% url 'user_update' user.pk %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil-square"></i>
+                    </a> -->
+                    <a href="{% url 'user_delete' user.pk %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td> 
+              </tr>
+            
+            {% empty %}
+              <tr>
+                  <td colspan="6" class="text-center py-4">
+                      <em>لا يوجد مستخدمين حتى الآن</em>
+                  </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

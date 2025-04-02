@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}لوحة التحكم{% endblock %}
+{% block content %}
+<!--===== DASHBOARD =====-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function updateStudentProgress() {
+        $.ajax({
+            url: "{% url 'student-progress-api' %}",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                if (data.students) {
+                    $(".student-card").each(function () {
+                        let studentId = $(this).data("id");
+                        let studentData = data.students.find(student => student.id == studentId);
+
+                        if (studentData) {
+                            // تحديث البيانات في الكارد
+                            $(this).find(".progress-bar").css("width", studentData.progress + "%");
+                            $(this).find(".progress-badge").text(studentData.progress.toFixed(0) + "%");
+                            $(this).find(".prep-count").text(studentData.prep_count);
+                            $(this).find(".action-count").text(studentData.action_count);
+                            $(this).find(".setup-count").text(studentData.setup_count);
+                            $(this).find(".execution-count").text(studentData.execution_count);
+
+                            // تحديث لون شريط التقدم بناءً على النسبة
+                            let progressBar = $(this).find(".progress-bar");
+                            if (studentData.progress >= 80) {
+                                progressBar.removeClass("bg-warning bg-danger").addClass("bg-success");
+                            } else if (studentData.progress >= 50) {
+                                progressBar.removeClass("bg-success bg-danger").addClass("bg-warning");
+                            } else {
+                                progressBar.removeClass("bg-success bg-warning").addClass("bg-danger");
+                            }
+                        }
+                    });
+                }
+            },
+            error: function () {
+                console.log("فشل في تحميل البيانات.");
+            }
+        });
+    }
+
+    // تحديث البيانات كل 10 ثوانٍ
+    setInterval(updateStudentProgress, 10000);
+</script>
+
+<div class="container mt-3">
+    <h2 class="text-center mb-4"><i class="bi bi-people-fill me-2"></i> الطلاب المشاركون في آخر حدث</h2>
+    <div class="row">
+        {% for student in students %}
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-4 student-card" data-id="{{ student.id }}">
+            <a href="{% url 'student_event_tasks_detail' pk=event.id student_id=student.id %}" class="text-decoration-none">
+                <div class="card border-0 shadow rounded-4 overflow-hidden">
+                    <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between px-3 pt-3">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle overflow-hidden border border-light ms-3" style="width: 65px; height: 65px;">
+                                <img src="{{ student.profile_picture.url|default:'/static/default.png' }}" 
+                                     alt="صورة الطالب" class="w-100 h-100 object-fit-cover">
+                            </div>
+                            <div>
+                                <h5 class="fw-bold m-0">
+                                    <i class="bi bi-person-badge-fill me-1"></i>
+                                    {% if student.gender == 'ذكر' %} المخترع {% else %} المخترعة {% endif %}
+                                    {{ student.user.full_name }}
+                                </h5>
+                            </div>
+                        </div>
+                        <span class="badge rounded-pill progress-badge 
+                                    {% if student.progress >= 80 %} bg-success 
+                                    {% elif student.progress >= 50 %} bg-warning 
+                                    {% else %} bg-danger {% endif %} p-2">
+                            <i class="bi bi-fire"></i> {{ student.progress|floatformat:0 }}%
+                        </span>
+                    </div>
+
+                    <div class="card-body bg-light p-4">
+                        <div class="row text-center">
+                            <div class="col">
+                                <h6 class="text-danger"><i class="bi bi-check-circle text-danger"></i> الاستعداد:</h6>
+                                <p class="fw-bold mb-1 prep-count">{{ student.prep_count }}</p>
+                            </div>
+                            <div class="col">
+                                <h6 class="text-warning"><i class="bi bi-tools text-warning"></i> الإجراءات:</h6>
+                                <p class="fw-bold mb-1 action-count">{{ student.action_count }}</p>
+                            </div>
+                            <div class="col">
+                                <h6 class="text-primary"><i class="bi bi-lightbulb text-primary"></i> التهيئة:</h6>
+                                <p class="fw-bold mb-1 setup-count">{{ student.setup_count }}</p>
+                            </div>
+                            <div class="col">
+                                <h6 class="text-success"><i class="bi bi-rocket text-success"></i> التنفيذ:</h6>
+                                <p class="fw-bold mb-1 execution-count">{{ student.execution_count }}</p>
+                            </div>
+                        </div>
+
+                        <div class="progress mt-3 rounded-3" style="height: 8px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated 
+                                        {% if student.progress >= 80 %} bg-success 
+                                        {% elif student.progress >= 50 %} bg-warning 
+                                        {% else %} bg-danger {% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ student.progress|floatformat:0 }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted mt-4"><i class="bi bi-emoji-frown fs-3"></i> لا يوجد بيانات متاحة حاليًا</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %} تفاصيل الحدث - {{ event.name }} {% endblock %}
+
+{% block content %}
+<div class="container my-3">
+    <!-- بطاقة المعلومات الرئيسية -->
+    <div class="card border-0 shadow-lg rounded-4 p-4" 
+        style="background: linear-gradient(135deg, #6c757d, #212529, #212529); color: white;">
+        
+        <!-- عنوان الحدث -->
+        <div class="text-center">
+            <h2 class="fw-bold display-6">{{ event.name }}</h2>
+            <p class="lead">{{ event.description }}</p>
+        </div>
+
+        <hr class="border-white opacity-50">
+
+        <!-- تفاصيل الحدث داخل بطاقة واحدة -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center text-center text-md-start">
+            <p class="fs-5 m-0"><i class="bi bi-person-fill"></i> عدد الطلاب {{ event.student_count }} </p>
+            <p class="fs-5 m-0"><i class="bi bi-calendar-event"></i> تاريخ الحدث: {{ event.event_date|date:"d M Y" }}</p>
+        </div>
+    </div>
+
+    <!-- 🛠️ شريط الإجراءات -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center my-3 gap-2">
+        <h5 class="text-muted"><i class="bi bi-list-check"></i> قائمة الطلاب</h5>
+        <div>
+            <form method="POST" action="{% url 'event_delete' event.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger text-white rounded-pill shadow-sm mx-2" onclick="return confirm('هل أنت متأكد من حذف هذا الحدث؟')">
+                    <i class="bi bi-trash"></i> حذف الحدث 
+                </button>
+            </form>
+            <a href="{% url 'event_update' event.pk %}" class="btn btn-primary rounded-pill shadow-sm">
+                <i class="bi bi-pencil-square"></i> تعديل الحدث
+            </a>
+        </div>
+    </div>
+    
+    <!-- ⚠️ رسائل التنبيهات -->
+    {% if messages %}
+        <div class="alert-container my-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% endif %} shadow-sm">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table id="usersTable" class="table table-responsive table-striped table-hover border align-middle">
+            <thead class="table-dark align-middle">
+                <tr>
+                    <th></th>
+                    <th>اسم الطالب</th>
+                    <th>الجنس</th>
+                    <th>الصف</th>
+                    <th>المدرسة</th>
+                    <th>إدارة التعليم</th>
+                    <th>المهام المنجزة</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>
+                        <div class="rounded-circle overflow-hidden" style="width: 60px; height: 60px;">
+                            <img src="{{ student.profile_picture.url }}" alt="صورة الطالب" class="w-100 h-100 object-fit-cover">
+                        </div>
+                    </td>
+                    <td class="fw-bold">{{ student.user.full_name }}</td>
+                    <td>{{ student.gender }}</td>
+                    <td>{{ student.grade }}</td>
+                    <td>{{ student.school }}</td>
+                    <td>{{ student.education_department }}</td>
+                    <td>{{ student.total_count }}</td>
+                    <td><a href="{% url 'student_event_tasks_detail' pk=event.id student_id=student.id %}" class="btn btn-outline-primary">
+                        <i class="bi bi-eye"></i> عرض المهام
+                    </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">لا يوجد طلاب في هذا الحدث.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

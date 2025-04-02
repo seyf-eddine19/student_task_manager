@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %} لوحة التحكم | المهام {% endblock %}
+
+{% block content %}
+<div class="container my-3">
+    <!-- 🔹 عنوان الصفحة -->
+    <div class="bg-dark text-white text-center p-4 rounded shadow-sm">
+        <h2 class="fw-bold"><i class="bi bi-check2-square"></i> إدارة المهام</h2>
+    </div>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center my-3">
+        <h5 class="text-muted mb-3 mb-md-0"><i class="bi bi-list-check"></i> قائمة المهام</h5>
+    </div>
+    
+    <!-- ⚠️ رسائل التنبيهات -->
+    {% if messages %}
+        <div class="alert-container my-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %} alert-success {% elif message.tags == 'error' %} alert-danger {% endif %} shadow-sm">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- 📋 قائمة المهام -->
+    <div class="card my-3 shadow-sm">
+        <ul class="list-group list-group-flush bg-secondary">
+            {% for task in tasks %}
+                <li class="list-group-item p-3 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1"><i class="bi bi-card-checklist"></i> {{ task.task.name }}</h5>
+                        <p class="mb-1 text-muted"><i class="bi bi-bar-chart"></i> المرحلة: {{ task.task.phase }}</p>
+                        <span class="badge {% if task.completed %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if task.completed %}
+                                <i class="bi bi-check-circle-fill"></i> منجز
+                            {% else %}
+                                <i class="bi bi-x-circle-fill"></i> غير منجز
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" action="{% url 'complete_task' task.pk %}">
+                        {% csrf_token %}
+                        <div class="d-flex flex-wrap justify-content-end align-items-center gap-2">
+                            {% if task.task.document_required %}
+                                {% if task.document %}
+                                    <a href="{{ task.document.url }}" target="_blank" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-file-earmark-text"></i> عرض المستند
+                                    </a>
+                                {% else %}
+                                    <input type="file" name="document" id="document" class="form-control form-control-sm" />
+                                    {% if task.completed %}
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-file-earmark-text"></i> رفع المستند
+                                    </button>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                            {% if not task.completed %}
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="bi bi-check-circle"></i> تم الإنجاز
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </li>
+            {% empty %}
+                <li class="list-group-item text-center text-muted p-3">
+                    <em>🚀 لا توجد مهام حالياً</em>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

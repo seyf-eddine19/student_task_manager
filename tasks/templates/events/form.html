@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{% if form.instance.pk %}تعديل الحدث{% else %}إضافة حدث جديد{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+    <!-- ⚠️ رسائل التنبيهات -->
+    {% if messages %}
+        <div class="alert-container my-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% endif %} shadow-sm">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="card shadow-sm rounded">
+        <div class="card-header bg-dark text-white">
+            <h4><i class="bi bi-folder-plus"></i> {% if form.instance.pk %}تعديل الحدث{% else %}إضافة حدث جديد{% endif %} </h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" class="custom-form">
+            {% csrf_token %}
+            
+
+                
+            <h3 class="mb-3 text-muted"><i class="bi bi-info-circle"></i> بيانات الحدث</h3>
+               
+            {{ form.as_p }}
+        
+        <!-- ✅ المهام المرتبطة بالحدث (عرضها كجدول فقط عند التحديث) -->
+        {% if task_formset %}
+        <div class="table-responsive my-3">
+            <table id="usersTable" class="table table-responsive table-striped table-hover border m-0">
+                <thead class="table-dark">
+                    <tr>
+                                <th><i class="bi bi-clipboard-check"></i> المهمة</th>
+                                <th><i class="bi bi-person"></i> المسؤول</th>
+                                <th><i class="bi bi-clock-history"></i> الحالة</th>
+                                <th><i class="bi bi-calendar-event"></i> تاريخ البداية</th>
+                                <th><i class="bi bi-calendar-check"></i> تاريخ الانتهاء</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ task_formset.management_form }}
+                    {% for task_form in task_formset %}
+                    <tr>{{ task_form.id }}
+                        <td>{{ task_form.task_name.value }}{{ task_form.task_name }}</td>
+                        <td>{{ task_form.assigned_to|default:"غير محدد" }}</td>
+                        <td><span class="badge 
+                            {% if task_form.status.value == 'قيد التنفيذ' %} bg-warning 
+                            {% elif task_form.status.value == 'مكتمل' %} bg-success 
+                            {% elif task_form.status.value == 'معلق' %} bg-danger
+                            {% else %} bg-secondary {% endif %}">
+                            {{ task_form.status.value }}</span>{{ task_form.status }}</td>
+                        <td>{{ task_form.start_date.value|default:"-" }}</td>
+                        <td>{{ task_form.end_date.value|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% endif %}
+
+                
+        <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-dark px-4 py-2"><i class="bi bi-save"></i> حفظ</button>
+            <a href="{% url 'event_list' %}" class="btn btn-danger px-4 py-2 mx-2"><i class="bi bi-x-circle"></i> إلغاء</a>
+        </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

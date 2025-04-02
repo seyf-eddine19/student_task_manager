@@ -1,0 +1,27 @@
+<header class="header navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <div class="d-flex w-100 px-3 justify-content-between align-items-center">
+        <!-- Logo -->
+        <div>
+            <!-- Toggle Button -->
+            <button class="btn btn-dark" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <a href="{% url 'index' %}" class="navbar-brand fw-bold">
+                لوحة التحكم
+            </a>
+        </div>
+        <!-- User Menu -->
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle d-flex align-items-center" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <div><i class="bi bi-person-circle"></i></div>
+                <span class="d-none d-md-inline mx-2"> {{ user.username }} </span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="userMenuButton">
+                <li><a href="{% url 'profile' %}" class="dropdown-item">الملف الشخصي</a></li>
+                <li><a href="{% url 'logout' %}" class="dropdown-item">تسجيل الخروج</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
